@@ -1,0 +1,41 @@
+[
+    {
+        "id": 1,
+        "name": "Contract A",
+        "startDate": 3,
+        "Monday": 0,
+        "Tuesday": 8, 
+        "Wednesday": 8, 
+        "Thursday": 0, 
+        "Friday": 0, 
+        "Saturday": 0, 
+        "Sunday": 0,
+        "Note": ""
+    },
+    {
+        "id": 2,
+        "name": "Contract A",
+        "startDate": 10,
+        "Monday": 0,
+        "Tuesday": 0, 
+        "Wednesday": 0, 
+        "Thursday": 0, 
+        "Friday": 0, 
+        "Saturday": 0, 
+        "Sunday": 0,
+        "Note": ""
+    },
+    {
+        "id": 3,
+        "name": "Contract B",
+        "startDate": 3,
+        "Monday": 0,
+        "Tuesday": 0, 
+        "Wednesday": 0, 
+        "Thursday": 0, 
+        "Friday": 0, 
+        "Saturday": 0, 
+        "Sunday": 0,
+        "Note": ""
+    }
+]
