@@ -14,7 +14,7 @@ import { connect } from "react-redux";
 const theme = createMuiTheme({
   palette: {
     primary: blue,
-    // secondary: white,
+    secondary: white,
     // text: {
     // primary: white,
   },
@@ -37,8 +37,8 @@ class App extends Component {
       <Router>
         <MuiThemeProvider theme={theme}>
           <div className="screen">
-            <MenuAppBar />
-            <Layout onSubmit={this.props.onSubmit} loggedIn={this.props.loggedIn} />
+            <MenuAppBar loggedIn={this.props.loggedIn} />
+            <Layout onSubmit={this.props.onSubmit} loggedIn={this.props.loggedIn} loginError={this.props.loginError} />
             <StickFooter />
           </div>
         </MuiThemeProvider >
@@ -51,7 +51,7 @@ const mapStateToProps = (state) => {
   return {
       loggingIn: state.user.loggingIn,
       loggedIn: state.user.loggedIn,
-      error: state.user.error
+      loginError: state.user.loginError
   }
 }
 

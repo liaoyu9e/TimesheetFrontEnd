@@ -7,13 +7,13 @@ const initialState = {
     error: false,
     contracts: [],
     weekTimes: [],
+    selectedMonday: null
 };
 
 export const weektime = (state = initialState, action) => {
     switch(action.type){
         case 'FETCH_TIMESHEET_PENDING': {
             return {...state, fetching: true};
-            break;
         }
         case 'FETCH_TIMESHEET_SUCCESS': {
             return {...state, 
@@ -22,23 +22,19 @@ export const weektime = (state = initialState, action) => {
                 contracts: action.payload.contracts,
                 weekTimes : action.payload.weekTimes
             };
-            break;
         }
         case 'FETCH_TIMESHEET_FAILURE': {
             return {...state, fetching: false, error: true};
-            break;
         }
         case 'UPDATE_WEEKTIME_INITIAL': {
-            return {...state, updated: false}
-            break;
+            return {...state, updated: false};
         }
         case 'UPDATE_WEEKTIME_PENDING': {
-            return {...state, updating: true}
-            break;
+            return {...state, updating: true};
         }
         case 'UPDATE_WEEKTIME_SUCCESS': {
             for(let i = 0; i < state.weekTimes.length; i++) {
-                if(state.weekTimes[i].weekId == action.payload.weekId) {
+                if(state.weekTimes[i].weekId === action.payload.weekId) {
                     state.weekTimes[i] = action.payload;
                     break;
                 }
@@ -47,11 +43,15 @@ export const weektime = (state = initialState, action) => {
                 updating: false, 
                 updated: true
             }
-            break;
         }
         case 'UPDATE_WEEKTIME_FAILURE': {
             return {...state, updating: false, error: true};
-            break;
+        }
+        case 'SELECT_MONDAY_INITIAL': {
+            return {...state, selectedMonday: null};
+        }
+        case 'SELECT_MONDAY': {
+            return {...state, selectedMonday: action.payload};
         }
         default: return state;
     }

@@ -13,7 +13,6 @@ export const user = (state = initialState, action) => {
                 loggedIn: false,
                 loginError: false
             };
-            break;
         }
         case 'LOGIN_SUCCESS': {
             return {...state, 
@@ -22,11 +21,9 @@ export const user = (state = initialState, action) => {
                 loginError: false,
                 user: action.payload.user
             };
-            break;
         }
         case 'LOGIN_FAILURE': {
             return {...state, loggingIn: false, loginError: true};
-            break;
         }
         case 'LOAD_TOKEN': {
             return {...state,
@@ -35,11 +32,9 @@ export const user = (state = initialState, action) => {
                 loginError: false,
                 user: action.payload.user
             }
-            break;
         }
         case 'LOGOUT':{
             return initialState;
-            break;
         }
         default: return state;
     }

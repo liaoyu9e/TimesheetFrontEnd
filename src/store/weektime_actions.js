@@ -41,16 +41,17 @@ export function fetchContracts(dispatch) {
     })
     .then(res => {
         let { contracts, weekTimes } = res.data;
+        // console.log(res.data);
         let fixedContracts = contracts.map(contract => ({
             ...contract,
-            startDate: new Date(contract.startDate),
-            endDate: contract.endDate == null ? null : new Date(contract.endDate)
+            startDate: new Date(Date.parse(contract.startDate)),
+            endDate: contract.endDate == null ? null : new Date(Date.parse(contract.endDate))
         }));
         let fixedWeektimes = weekTimes.map(weektime => ({
             ...weektime,
-            mondayDate: new Date(weektime.mondayDate)
+            mondayDate: new Date(Date.parse(weektime.mondayDate))
         }));
-        console.log("Fetched the timesheet info successfully!", fixedContracts, fixedWeektimes);
+        console.log("Fetched the timesheet info successfully!", contracts, weekTimes);
         dispatch(fetchSuccess(fixedContracts, fixedWeektimes));
     })
     .catch(e => {
@@ -92,5 +93,18 @@ export function update(weektime, dispatch, submit = false) {
         dispatch({
             type: 'UPDATE_WEEKTIME_FAILURE'
         });
+    });
+}
+
+export function selectInitial(dispatch) {
+    dispatch({
+        type: 'SELECT_MONDAY_INITIAL'
+    });
+}
+
+export function select(dispatch, mondayDate) {
+    dispatch({
+        type: 'SELECT_MONDAY',
+        payload: mondayDate
     });
 }

@@ -55,7 +55,8 @@ class InputDay extends React.Component {
     onClickHour = () => {
         let newHours = this.state.hours + this.state.addHours;
         this.setState({
-            hours: newHours
+            hours: newHours,
+            addHours: 0
         });
         setTimeout(() => {
             this.props.onAddHour(this.props.weekDay, this.state.hours);
@@ -63,9 +64,28 @@ class InputDay extends React.Component {
         }, 10)
     }
 
+    limit = (val, max) => {
+        max = max.toString();
+        if(max <= 0){
+            return '0';
+        }
+        
+        if (val[0] === '-') {
+          return '0';
+        }
+      
+        if(val.length > max.length || Number(val) > Number(max)) {
+            val = max;
+        }
+      
+        return val;
+    }
+
     onChangeHours(event) {
+        let hourString = this.limit(event.target.value, 24 - this.state.hours);
+        console.log(hourString);
         this.setState({
-            addHours: parseInt(event.target.value)
+            addHours: parseInt(hourString)
         });
     }
 
@@ -93,6 +113,7 @@ class InputDay extends React.Component {
                                         placeholder="Hours"
                                         className={this.props.classes.textField}
                                         margin="normal"
+                                        value={this.state.addHours}
                                         onChange={(event) => this.onChangeHours(event)}
                                         type="number"
                                     />

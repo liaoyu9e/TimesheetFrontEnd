@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from 'material-ui/styles';
 import { Link } from 'react-router-dom';
-import Card, { CardActions, CardContent } from 'material-ui/Card';
+import Card, { CardContent } from 'material-ui/Card';
 import Button from 'material-ui/Button';
 import Typography from 'material-ui/Typography';
 import ContractList from './ContractList';
@@ -31,16 +31,16 @@ const styles = theme => ({
 });
 
 class Histories extends React.Component {
-    constructor(props) {
-        super(props);
+    // constructor(props) {
+    //     super(props);
         // this.state = {
 
         // };
-    }
+    // }
 
     render() {
         const { classes, user, location, contracts, weekTimes } = this.props;
-        if(location.search != "") {
+        if(location.search !== "") {
             console.log("search for monday...");
             let query = parseQueryParams(location.search);
             let mondayDate = new Date(query.monday);

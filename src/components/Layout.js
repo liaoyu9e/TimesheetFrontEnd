@@ -3,14 +3,13 @@ import PropTypes from 'prop-types';
 import { withStyles } from 'material-ui/styles';
 import { Route, Switch } from 'react-router-dom';
 import Redirect from 'react-router-dom/Redirect';
-
-import ContractList from './ContractList';
-import InputTimeSheet from './InputTimeSheet';
-import SideBar from './SideBar';
+// import ContractList from './ContractList';
+// import InputTimeSheet from './InputTimeSheet';
+// import SideBar from './SideBar';
 import TimeSheet from './TimeSheet';
-import Detail from './Detail';
-import Histories from './Histories';
-import HistoryDetail from './HistoryDetail';
+// import Detail from './Detail';
+// import Histories from './Histories';
+// import HistoryDetail from './HistoryDetail';
 import LoginForm from './LoginForm';
 import Dashboard from './Dashboard';
 
@@ -26,13 +25,9 @@ const styles = {
 }
 
 class Layout extends Component {
-    constructor(props) {
-        super(props);
-    }
-
-    componentWillMount() {
-
-    }
+    // constructor(props) {
+    //     super(props);
+    // }
     
     render() {
         const PrivateRoute = ({component: Component, ...rest}) => (
@@ -55,7 +50,7 @@ class Layout extends Component {
                         <Route exact path="/" component={Dashboard} />
                         <PrivateRoute path="/timesheet" component={TimeSheet} />
                         {/* <Route path="/timesheet/detail" component={Detail} /> */}
-                        <Route path="/login" render={(props) => <LoginForm {...props} onSubmit={this.props.onSubmit} loggedIn={this.props.loggedIn}/>} />
+                        <Route path="/login" render={(props) => <LoginForm {...props} onSubmit={this.props.onSubmit} loggedIn={this.props.loggedIn} loginError={this.props.loginError} />} />
                         {/* <Route exact path="/history" component={Histories} />
                         <Route path="/history/detail" component={HistoryDetail} /> */}
                     </Switch>

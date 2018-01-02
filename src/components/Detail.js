@@ -7,19 +7,18 @@ import Dialog, {
     DialogActions,
     DialogContent,
     DialogContentText,
-    DialogTitle,
+    // DialogTitle,
   } from 'material-ui/Dialog';
 import { connect } from "react-redux";
 import Redirect from 'react-router-dom/Redirect';
-import InputDay from './InputDay';
+import Card, { CardContent } from 'material-ui/Card';
+import Typography from 'material-ui/Typography';
+import TextField from 'material-ui/TextField';
+// import InputDay from './InputDay';
 // import InputTimeSheet from './InputTimeSheet';
 // import SideBar from './SideBar';
 
-import {
-    BrowserRouter as Router,
-    Route,
-    Link
-} from 'react-router-dom'
+import { Link } from 'react-router-dom';
 import { update, updateInitial } from '../store/weektime_actions';
 
 const styles = {
@@ -54,27 +53,56 @@ const styles = {
         display: "flex",
         flexWrap: "nowrap",
     },
+    card: {
+        // minWidth: 275,
+        // maxWidth:100,
+        padding: 0,
+        marginBottom: 10,
+        borderRadius: 0,
+        backgroundColor: "rgba(255, 255, 255, 0.90)",
+        '&:hover': {
+            boxShadow: '2px 3px 5px 0px rgba(158,158,158, 1)',
+            // boxShadow: '0px 3px 5px 3px rgba(158,158,158, 1)',
+            backgroundColor: "white",
+        }
+    },
+    headline: {
+        // color: "white",  //theme.palette.common.white
+        // margin: 'auto',
+        fontSize: "85%",
+    },
 }
 
 class Detail extends React.Component {
-    constructor(props) {
+    constructor(props, weekdays) {
         super(props);
         this.state = {
             dialogOpen: false,
             redirected: false,
-            updateWeektime: null
+            updateWeektime: null,
+            total: 0
         };
+        this.weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
     }
 
     componentWillMount() {
-        console.log("Week time details initializing...");
-        this.props.initial();
         let { windex } = this.props.match.params;
-        let { weekTimes } = this.props;
+        let { weekTimes, contracts } = this.props;
+        if(weekTimes.length === 0 || contracts.length === 0){
+            return;
+        }
+        console.log("Week time details initializing...");
+        
         let weektime = weekTimes[windex];
         this.setState({
             updateWeektime: weektime
         });
+        if(!weektime.submitted){
+            this.props.initial();
+        }
+        setTimeout(() => {
+            this.sumHours();
+        }, 50);
     }
 
     componentDidUpdate() {
@@ -82,19 +110,63 @@ class Detail extends React.Component {
             console.log("Redirecting back to timesheet");
             setTimeout(() => {
                 this.setState({redirected: true});
-            }, 1000);
+            }, 800);
         }
     }
 
-    handleAddHour = (dayOfWeek, hours) => {
+    limit = (val, max) => {
+        max = max.toString();
+        if(max <= 0){
+            return '0';
+        }
+        
+        if (val[0] === '-') {
+          return '0';
+        }
+      
+        if(val.length > max.length || Number(val) > Number(max)) {
+            val = max;
+        }
+      
+        return Number(val);
+    }
+
+    sumHours = () => {
+        let { updateWeektime } = this.state;
+        let total = 0;
+        this.weekdays.forEach((weekday) => {
+            total += updateWeektime[weekday.toLowerCase()];
+        });
+        this.setState({
+            total: total
+        });
+    }
+
+    onChangeHours = dayOfWeek => event => {
+        let hours = this.limit(event.target.value, 24)
         console.log(dayOfWeek, hours);
         let updateWeektime = this.state.updateWeektime;
+        let oldHours = updateWeektime[dayOfWeek];
+        let oldTotal = this.state.total;
         // let newWeekTime = {...updateWeektime}
         // newWeekTime[dayOfWeek.toLowerCase()] = hours;
         this.setState({
-            updateWeektime: {...updateWeektime, [dayOfWeek.toLowerCase()]: hours}
+            total: oldTotal - oldHours + hours,
+            updateWeektime: {...updateWeektime, [dayOfWeek]: hours}
         });
-        console.log(this.state.updateWeektime);
+        setTimeout(() => {
+            console.log(this.state.updateWeektime);
+        }, 10);
+    }
+
+    onChangeNote = event => {
+        let updateWeektime = this.state.updateWeektime;
+        this.setState({
+            updateWeektime: {...updateWeektime, note: event.target.value}
+        });
+        setTimeout(() => {
+            console.log(this.state.updateWeektime);
+        }, 10);
     }
 
     update = () => {
@@ -121,7 +193,7 @@ class Detail extends React.Component {
     };
 
     render() {
-        if(this.props.fetching) {
+        if (this.props.fetching) {
             return (
                 <p>Loading...</p>
             );
@@ -132,18 +204,28 @@ class Detail extends React.Component {
                 <Redirect to='/timesheet' />
             )
         }
+        let { updateWeektime } = this.state;
+        const { updated, classes, contracts } = this.props
+        let contract = null;
+        for(let i = 0; i < contracts.length; i++) {
+            if(updateWeektime.contractId === contracts[i].id) {
+                contract = contracts[i];
+                break;
+            }
+        }
+        
         return (
-            <Grid container className={this.props.classes.gridContainer} justify="center">
+            <Grid container className={classes.gridContainer} justify="center">
                 <Grid item xs={12}>
-                    {this.props.updated &&
+                    {updated &&
                         (
-                            <div className={this.props.classes.alert}>
-                                <span className={this.props.classes.closebtn} onClick={this.handleCloseAlert}>&times;</span>
+                            <div className={classes.alert}>
+                                <span className={classes.closebtn} onClick={this.handleCloseAlert}>&times;</span>
                                 Successfully updated!
                             </div>
                         )
                     }
-                    <Link to="/timesheet"><Button raised color="primary">Back</Button></Link>
+                    <Link to={updateWeektime.submitted ? "/timesheet/history" : "/timesheet"}><Button raised color="primary">Back</Button></Link>
                     <div>
                         <Dialog
                         open={this.state.dialogOpen}
@@ -167,31 +249,89 @@ class Detail extends React.Component {
                             </DialogActions>
                         </Dialog>
                     </div>
+                    <div className={classes.centerText}>
+                        <h2>
+                            Week {updateWeektime.mondayDate.toLocaleDateString().slice(0,10)} to {new Date(updateWeektime.mondayDate.getTime() + 6*24*3600*1000).toLocaleDateString().slice(0,10) }
+                        </h2>
+                        <h2>Project: {contract.projectName}</h2>
+                        <h2>Company: {contract.companyName}</h2>
+                    </div>
                     {/* <InputTimeSheet weektime={weektime} /> */}
                     <Grid
-                    className={this.props.classes.root}
+                    // className={classes.root}
                     container
-                    spacing={16}
+                    spacing={8}
                     direction={'row'}
                     justify={'center'}
                     alignItems={'center'}
                     >
-                        {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].map(weekday => (
-                            <Grid key={weekday} item xs className={this.props.classes.gridItem}>
-                                <InputDay 
+                        {this.weekdays.map(weekday => (
+                            <Grid key={weekday} item xs className={classes.gridItem}>
+                                {/* <InputDay 
                                 weekDay={weekday} 
                                 hours={this.state.updateWeektime[weekday.toLowerCase()]}
                                 onAddHour={this.handleAddHour}
                                 hideInput={this.state.updateWeektime.submitted}
-                                />
+                                /> */}
+                                <Card className={this.props.classes.card}>
+                                    <CardContent>
+                                        {/* <Typography type="headline" className={classes.headline}>  */}
+                                        <Typography align="center" className={this.props.classes.headline}>
+                                            {weekday}
+                                        </Typography>
+                                    </CardContent>
+                                    <CardContent>
+                                        <TextField
+                                            disabled={this.state.updateWeektime.submitted}
+                                            label="Hours"
+                                            placeholder="Hours"
+                                            margin="normal"
+                                            value={this.state.updateWeektime[weekday.toLowerCase()]}
+                                            onChange={this.onChangeHours(weekday.toLowerCase())}
+                                            type="number"
+                                        />
+                                    </CardContent>
+                                </Card>
                             </Grid>
                         ))}
+                        <Grid item xs={12} className={classes.gridItem}>
+                            <Card className={this.props.classes.card}>
+                                <CardContent>
+                                    <TextField
+                                        fullWidth={true}
+                                        disabled={this.state.updateWeektime.submitted}
+                                        label="Note"
+                                        margin="normal"
+                                        multiline={true}
+                                        value={this.state.updateWeektime.note == null ? "" : this.state.updateWeektime.note}
+                                        onChange={this.onChangeNote}
+                                        type="text"
+                                    />
+                                </CardContent>
+                            </Card>
+                        </Grid>
+                        <Grid item xs={12} className={classes.gridItem}>
+                            <Typography align="right">
+                                Total: {this.state.total}
+                            </Typography>
+                        </Grid>
                     </Grid>
                     {!this.state.updateWeektime.submitted && (
-                        <div>
-                            <Button raised color="primary" onClick={this.handleClickOpen}>Submit</Button>
-                            <Button raised color="primary" onClick={this.update}>Save</Button>
-                        </div>
+                        <Grid
+                        // className={classes.root}
+                        container
+                        spacing={16}
+                        direction={'row'}
+                        justify={'center'}
+                        alignItems={'center'}
+                        >
+                            <Grid item xs={6} className={classes.gridItem}>
+                                <Button raised color="primary" onClick={this.handleClickOpen}>Submit</Button>
+                            </Grid>
+                            <Grid item xs={6} className={classes.gridItem}>
+                                <Button raised color="primary" onClick={this.update}>Save</Button>
+                            </Grid>
+                        </Grid>
                     )}
                 </Grid>
             </Grid>
@@ -207,7 +347,8 @@ const mapStateToProps = (state) => {
     return {
         fetching: state.weektime.fetching,
         updated: state.weektime.updated,
-        weekTimes: state.weektime.weekTimes
+        weekTimes: state.weektime.weekTimes,
+        contracts: state.weektime.contracts
     }
   }
   

@@ -3,9 +3,8 @@ import InfiniteCalendar from 'react-infinite-calendar';
 import PropTypes from 'prop-types';
 import { withStyles } from 'material-ui/styles';
 import Typography from 'material-ui/Typography';
-import Card, { CardActions, CardContent } from 'material-ui/Card';
-import Button from 'material-ui/Button';
-import TextField from 'material-ui/TextField';
+import Card, { CardContent } from 'material-ui/Card';
+// import Button from 'material-ui/Button';
 
 const styles = {
     card: {
@@ -36,16 +35,22 @@ class SideBar extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            hideInput: false,
+            // hideInput: false,
         };
     }
 
     componentDidMount() {
-        if (this.props.hideInput == true) {
-            this.setState({
-                hideInput: true
-            })
-        }
+        // if (this.props.hideInput == true) {
+        //     this.setState({
+        //         hideInput: true
+        //     })
+        // }
+    }
+
+    onCalenderSelect = (date) => {
+        let offset = (date.getDay() - 1) % 7;
+        date.setDate(date.getDate() - offset);
+        this.props.select(date);
     }
 
     // const { classes } = props;
@@ -59,7 +64,11 @@ class SideBar extends React.Component {
                     }}
                     width={"100%"}
                     height={window.innerWidth * 0.15} // height={336} 
-                    selected={new Date()}
+                    locale={{
+                        weekStartsOn: 1
+                    }}
+                    selected={this.props.selectedMonday == null ? new Date() : this.props.selectedMonday}
+                    onSelect={this.onCalenderSelect}
                 />
                 <Card className={this.props.classes.card}>
                     <CardContent>
@@ -72,20 +81,6 @@ class SideBar extends React.Component {
                             {'"Contractor Description: "'}
                         </Typography>
                     </CardContent>
-                </Card>
-                <Card className={this.props.classes.card} hidden={this.props.hideNote}>
-                    <CardContent>
-                        {this.state.hideInput == false &&
-                            <form className={this.props.classes.container} noValidate autoComplete="off">
-                                <TextField
-                                    label="Note"
-                                    multiline
-                                    className={this.props.classes.textField}
-                                    margin="normal"
-                                />
-                            </form>
-                        }
-                     </CardContent>
                 </Card>
             </div>
         );

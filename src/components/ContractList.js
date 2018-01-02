@@ -1,15 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from 'material-ui/styles';
-import Card, { CardActions, CardContent } from 'material-ui/Card';
+import Card, { CardContent } from 'material-ui/Card';
 import Typography from 'material-ui/Typography';
 
 import {
-    BrowserRouter as Router,
-    Route,
+    // BrowserRouter as Router,
+    // Route,
     Link
-} from 'react-router-dom'
-import { parseQueryParams } from '../utilities';
+} from 'react-router-dom';
 
 const styles = theme => ({
     card: {
@@ -33,9 +32,9 @@ const styles = theme => ({
 });
 
 class ContractList extends React.Component {
-    constructor(props) {
-        super(props);
-    }
+    // constructor(props) {
+    //     super(props);
+    // }
 
     render() {
         const { classes, contracts, weekTimes, mondayDate } = this.props;
@@ -57,10 +56,10 @@ class ContractList extends React.Component {
             let search_index = 0;
             let found = false;
             for(let j = 0; j < historyWeektimes.length; j++) {
-                if(historyWeektimes[j].mondayDate.getDate() == mondayDate.getDate() && historyWeektimes[j].contractId == renderContracts[i].id) {
+                if(historyWeektimes[j].mondayDate.getDate() === mondayDate.getDate() && historyWeektimes[j].contractId === renderContracts[i].id) {
                     let weekId = historyWeektimes[j].weekId;
                     for(let k = 0; k < weekTimes.length; k++) {
-                        if(weekId == weekTimes[k].weekId){
+                        if(weekId === weekTimes[k].weekId){
                             search_index = k;
                             break;
                         } 

@@ -1,17 +1,17 @@
 import React from 'react';
-import PropTypes, { element } from 'prop-types';
+import PropTypes from 'prop-types';
 import { withStyles } from 'material-ui/styles';
-import Card, { CardActions, CardContent } from 'material-ui/Card';
+import Card, { CardContent } from 'material-ui/Card';
 import Button from 'material-ui/Button';
 import Typography from 'material-ui/Typography';
+import IconButton from 'material-ui/IconButton';
+import Refresh from 'material-ui-icons/Refresh';
 
 import {
-    BrowserRouter as Router,
-    Route,
+    // BrowserRouter as Router,
+    // Route,
     Link
 } from 'react-router-dom'
-import { parseQueryParams } from '../utilities';
-import { weektime } from '../store/weektimeReducer';
 
 const styles = theme => ({
     card: {
@@ -35,26 +35,18 @@ const styles = theme => ({
 });
 
 class WeekTimeList extends React.Component {
-    constructor(props) {
-        super(props);
-    }
-
-    // attachContract = (weektime) => {
-    //     let { contracts } = this.props;
-    //     let contract = null;
-    //     contracts.forEach(element => {
-    //         if(element.id = weektime.contractId)
-    //             contract = element;
-    //     });
-    //     return {...weektime, contract: contract};
+    // constructor(props) {
+    //     super(props);
     // }
 
     render() {
-        const { classes, weekTimes, contracts } = this.props;
-        let renderWeekTimes = weekTimes.filter(weektime => !weektime.submitted).map(weektime => {
+        const { classes, weekTimes, contracts, history, selectedMonday } = this.props;
+        let renderWeekTimes = weekTimes
+        .filter(weektime => history ? weektime.submitted : !weektime.submitted)
+        .map(weektime => {
             let goalContract = null;
             for(let i = 0; i < contracts.length; i++) {
-                if(contracts[i].id == weektime.contractId){
+                if(contracts[i].id === weektime.contractId){
                     goalContract = {...contracts[i]};
                     break;
                 }   
@@ -62,11 +54,15 @@ class WeekTimeList extends React.Component {
             let newWeekTime = {...weektime, contract: goalContract};
             // console.log(newWeekTime);
             return newWeekTime;
-        });
+        })
+        .sort((wa, wb) => (wb.mondayDate.getTime() - wa.mondayDate.getTime()));
+        if(selectedMonday != null) {
+            renderWeekTimes = renderWeekTimes.filter(weektime => weektime.mondayDate.getTime() === selectedMonday.getTime());
+        }
         let map = new Map();
         renderWeekTimes.forEach((weektime, index) => {
             for(let i = 0; i < weekTimes.length; i++) {
-                if(weektime.weekId == weekTimes[i].weekId){
+                if(weektime.weekId === weekTimes[i].weekId){
                     map.set(index, i);
                 }
             }
@@ -74,13 +70,38 @@ class WeekTimeList extends React.Component {
         console.log(map);
         return (
             <div>
-                <Link to={this.props.match.url + '/history'}>
-                    <Button raised color="primary">View History</Button>
-                </Link>
+                {history ? (
+                    <div style={{marginBottom:10}}>
+                        <h2 style={{textAlign:"center"}}>Timesheet History</h2>
+                        <Link to={'/timesheet'}>
+                            <Button raised color="primary">Back</Button>
+                        </Link>
+                        <IconButton
+                        onClick={this.props.selectInitial}
+                        color="primary"
+                        >
+                            <Refresh />
+                        </IconButton>
+                    </div>
+                ) : (
+                    <div style={{marginBottom:10}}>
+                        <h2 style={{textAlign:"center"}}>Timesheet to be filled</h2>
+                        <Link to={'/timesheet/history'}>
+                            <Button raised color="primary">View History</Button>
+                        </Link>
+                        <IconButton
+                        onClick={this.props.selectInitial}
+                        color="primary"
+                        >
+                            <Refresh />
+                        </IconButton>
+                    </div>
+                )}
+                
                 {renderWeekTimes.map((weektime, index) => (
                     <Card key={index} className={classes.card}>
                         <CardContent>
-                            <Link to={this.props.match.url + '/weektime' + map.get(index)}>
+                            <Link to={'/timesheet/weektime' + map.get(index)}>
                                 <Typography type="headline" component="h2" className={classes.title}>
                                     Week from {weektime.mondayDate.toLocaleDateString().slice(0,10)} to: {new Date(weektime.mondayDate.getTime() + 6*24*3600*1000).toLocaleDateString().slice(0,10)}
                                 </Typography>
